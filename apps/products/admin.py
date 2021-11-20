@@ -2,30 +2,30 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .models import Detail, OilContainer, Oil, Service, KitService
+from .models import Part, OilContainer, Oil, Work, KitService
 
 
-class DetailAdmin(admin.ModelAdmin):
+class PartAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_display = ('product_name',
                     'in_price',
                     'out_price',
-                    'detail_number_original',
-                    'detail_manufacturer',
-                    'detail_number_cross',
-                    'detail_provider',
+                    'part_number_original',
+                    'part_manufacturer',
+                    'part_number_cross',
+                    'part_provider',
                     'stock',
                     'is_available'
                     )
-    list_filter = ('detail_number_original',
-                   'detail_number_cross',
-                   'detail_provider',
+    list_filter = ('part_number_original',
+                   'part_number_cross',
+                   'part_provider',
                    'is_available'
                    )
 
-    search_fields = ['detail_number_original',
-                     'detail_number_cross',
-                     'detail_provider'
+    search_fields = ['part_number_original',
+                     'part_number_cross',
+                     'part_provider'
                      ]
 
 
@@ -68,47 +68,43 @@ class OilAdmin(admin.ModelAdmin):
     get_container_volume.short_description = 'Тара'
 
 
-class ServiceAdmin(admin.ModelAdmin):
+class WorkAdmin(admin.ModelAdmin):
     list_per_page = 20
-    list_display = ('product_name',
-                    'in_price',
-                    'out_price',
+    list_display = ('service_name',
                     'work_our',
 
                     )
-    list_filter = ('product_name',
+    list_filter = ('service_name',
                    'work_our',
                    )
 
-    search_fields = ['product_name',
+    search_fields = ['service_name',
                      ]
 
 
 class KitServiceAdmin(admin.ModelAdmin):
     list_per_page = 20
-    list_display = ('product_name',
-                    'in_price',
-                    'out_price',
-                    'kit_work_ours',
+    list_display = ('service_name',
                     'get_link_to_services',
+                    'work_our',
                     )
-    list_filter = ('product_name',
-                   'kit_work_ours',
-                   'services__product_name'
+    list_filter = ('service_name',
+                   'work_our',
+                   'services__service_name'
                    )
 
-    search_fields = ['product_name',
+    search_fields = ['service_name',
                      ]
 
-    def get_link_to_services(self,obj):
+    def get_link_to_services(self, obj):
         return format_html(", ".join(["<a href={}> {} \n</a>".format(reverse(
-            'admin:products_service_change', args=(service.pk,)), str(service)) for service in obj.services.all()]))
+            'admin:products_work_change', args=(work.pk,)), str(work)) for work in obj.services.all()]))
 
     get_link_to_services.short_description = 'Перечень работ'
 
 
-admin.site.register(Detail, DetailAdmin)
+admin.site.register(Part, PartAdmin)
 admin.site.register(OilContainer, OilContainerAdmin)
 admin.site.register(Oil, OilAdmin)
-admin.site.register(Service, ServiceAdmin)
+admin.site.register(Work, WorkAdmin)
 admin.site.register(KitService, KitServiceAdmin)

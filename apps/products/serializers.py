@@ -1,17 +1,17 @@
 from rest_framework import serializers
-from .models import Detail, Oil, Service, KitService, OilContainer
+from .models import Part, Oil, Work, KitService, OilContainer
 
 
-class DetailSerializer(serializers.ModelSerializer):
+class PartSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Detail
+        model = Part
         fields = '__all__'
 
 
-class DetailBriefSerializer(serializers.ModelSerializer):
+class PartBriefSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Detail
-        fields = ('product_name', 'detail_number_original', 'detail_manufacturer', 'detail_number_cross', 'is_available')
+        model = Part
+        fields = ('product_name', 'part_number_original', 'part_manufacturer', 'part_number_cross', 'is_available')
 
 
 class OilSerializer(serializers.ModelSerializer):
@@ -32,16 +32,16 @@ class OilContainerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ServiceSerializer(serializers.ModelSerializer):
+class WorkSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Service
+        model = Work
         fields = '__all__'
 
 
-class ServiceBriefSerializer(serializers.ModelSerializer):
+class WorkBriefSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Service
-        fields = ('product_name', 'work_our')
+        model = Work
+        fields = ('service_name', 'work_our')
 
 
 class KitServiceSerializer(serializers.ModelSerializer):
@@ -53,4 +53,4 @@ class KitServiceSerializer(serializers.ModelSerializer):
 class KitServiceBriefSerializer(serializers.ModelSerializer):
     class Meta:
         model = KitService
-        fields = ('product_name', 'kit_work_ours')
+        fields = ('service_name', 'work_our')

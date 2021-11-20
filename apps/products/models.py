@@ -1,59 +1,122 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 from datetime import date
-from django.db.models.signals import m2m_changed
+from apps.workorders.models import Work_order
 
 
 class Products(models.Model):
     product_name = models.CharField(max_length=100,
                                     verbose_name='Название',
-                                    help_text='Введите названия продукта/услуги',
+                                    help_text='Введите названия продукта',
                                     )
     in_price = models.PositiveIntegerField(default=0,
                                            verbose_name='Себестоимость грн.',
-                                           help_text='Введите цену от поставщика продукта/услуги',
+                                           help_text='Введите цену от поставщика продукта',
                                            )
+    extra_charge = models.PositiveIntegerField(default=25,
+                                               verbose_name='Наценка %',
+                                               help_text='Введите сколько % необходимо добавить к себестоимости продукта',
+                                               )
     out_price = models.PositiveIntegerField(default=0,
                                             verbose_name='Стоимость грн.',
-                                            help_text='Введите цену для клиента продукта/услуги',
+                                            help_text='Поле зааполнится автоматически',
                                             )
+    is_available = models.BooleanField(verbose_name='на склад',
+                                       help_text='для добавления на склад поставьте галочку',
+                                       default=False
+                                       )
+    work_order = models.ForeignKey(Work_order,
+                                   on_delete=models.CASCADE,
+                                   null=True,
+                                   verbose_name='ЗН',
+                                   help_text='выберите ЗН',
+                                   blank=True
+                                   )
+
+    def save(self, *args, **kwargs):
+        self.out_price = self.in_price + (self.in_price/100 *self.extra_charge)
+
+        super(Products, self).save(*args, **kwargs)
 
     class Meta:
         abstract = True
 
 
-class Detail(Products):
-    detail_number_original = models.CharField(max_length=100,
-                                              verbose_name='№ детали оригинал',
-                                              help_text='Введите № детали по каталогу оригинального производителя ',
-                                              )
-    detail_manufacturer = models.CharField(max_length=100,
-                                           verbose_name='производитель детали',
-                                           help_text='Введите название поставщика детали',
-                                           )
-    detail_number_cross = models.CharField(null=True,
-                                           max_length=100,
-                                           verbose_name='cross № детали',
-                                           help_text='Введите № детали по "заменителю"',
-                                           blank=True)
-    detail_provider = models.CharField(max_length=100,
-                                       verbose_name='поставщик детали',
-                                       help_text='Введите название поставщика детали',
-                                       )
+class Service(models.Model):
+    service_name = models.CharField(null=True,
+                                    max_length=100,
+                                    verbose_name='Название',
+                                    help_text='Введите названия работы',
+                                    )
+    work_our = models.PositiveIntegerField(
+                                   default=1,
+                                   verbose_name='н.часы (AV)',
+                                   help_text='Введите количество н.часов (AV, 1 = 5мин)',
+                                   )
+    work_order = models.ForeignKey(Work_order,
+                                   on_delete=models.CASCADE,
+                                   null=True,
+                                   verbose_name='ЗН',
+                                   help_text='выберите ЗН',
+                                   blank=True
+                                   )
+    class Meta:
+        abstract = True
+
+
+class Work(Service):
+
+    def __str__(self):
+        return '{} {}ч'.format(self.service_name, self.work_our)
+
+    class Meta:
+        verbose_name_plural = 'Услуги (работы)'
+
+
+class KitService(Service):
+
+    services = models.ManyToManyField(Work,
+                                      related_name='kit_service',
+                                      verbose_name='набор работ',
+                                      help_text='Выберите работы из которых состоит услуга',
+                                      )
+
+    def __str__(self):
+        return '{} {}ч'.format(self.service_name, self.work_our)
+
+    class Meta:
+        verbose_name_plural = 'Услуги (набор работ)'
+
+
+class Part(Products):
+    part_number_original = models.CharField(max_length=100,
+                                            verbose_name='№ детали оригинал',
+                                            help_text='Введите № детали по каталогу оригинального производителя ',
+                                            )
+    part_manufacturer = models.CharField(max_length=100,
+                                         verbose_name='производитель детали',
+                                         help_text='Введите название поставщика детали',
+                                         )
+    part_number_cross = models.CharField(null=True,
+                                         max_length=100,
+                                         verbose_name='cross № детали',
+                                         help_text='Введите № детали по "заменителю"',
+                                         blank=True)
+    part_provider = models.CharField(max_length=100,
+                                     verbose_name='поставщик детали',
+                                     help_text='Введите название поставщика детали',
+                                     )
     stock = models.PositiveIntegerField(default=1,
                                         verbose_name='кол-во',
                                         help_text='Введите количество деталей',
                                         )
-    is_available = models.BooleanField(verbose_name='на склад',
-                                       help_text='для добавления детали на склад поставьте галочку',
-                                       default=False)
 
     def __str__(self):
         return '{} №{} {} cross№{} поставщик {}'.format(self.product_name,
-                                                        self.detail_number_original,
-                                                        self.detail_manufacturer,
-                                                        self.detail_number_cross,
-                                                        self.detail_provider)
+                                                        self.part_number_original,
+                                                        self.part_manufacturer,
+                                                        self.part_number_cross,
+                                                        self.part_provider)
 
     class Meta:
         verbose_name_plural = 'Детали'
@@ -101,10 +164,7 @@ class Oil(Products):
                                   help_text='Введите количество л',
                                   validators=[MinValueValidator(0.00)]
                                   )
-    is_available = models.BooleanField(verbose_name='на склад',
-                                       help_text='для добавления масла на склад поставьте галочку',
-                                       default=False
-                                       )
+
     container = models.OneToOneField(OilContainer,
                                      on_delete=models.CASCADE,
                                      related_name='oil',
@@ -117,61 +177,5 @@ class Oil(Products):
 
     class Meta:
         verbose_name_plural = 'Масло'
-
-
-class Service(Products):
-    work_our = models.DecimalField(decimal_places=2,
-                                   max_digits=12,
-                                   default=1,
-                                   verbose_name='нормо-часы',
-                                   help_text='Введите количество часов',
-                                   validators=[MinValueValidator(0.00)]
-                                   )
-
-    def __str__(self):
-        return '{} {}ч'.format(self.product_name, self.work_our)
-
-    class Meta:
-        verbose_name_plural = 'Услуги (работы)'
-
-
-class KitService(Products):
-    services = models.ManyToManyField(Service,
-                                      verbose_name='набор работ',
-                                      help_text='Выберите работы из которых состоит услуга',
-                                      )
-
-    kit_work_ours = models.DecimalField(decimal_places=2,
-                                        max_digits=12,
-                                        default=0,
-                                        verbose_name='нормо-часы',
-                                        help_text='Поле заполнится автоматически',
-                                        )
-
-
-    # def save(self, *args, **kwargs):
-    #     count_work_our = 0
-    #     kit_in_price = 0
-    #     kit_out_price = 0
-    #     for work in self.services.all():
-    #         count_work_our += work.work_our
-    #         kit_in_price += work.in_price
-    #         kit_out_price += work.out_price
-    #     self.kit_work_ours = count_work_our
-    #     self.in_price = kit_in_price
-    #     self.out_price = kit_out_price
-    #
-    #     super().save(*args, **kwargs)
-
-
-    def __str__(self):
-        return '{} {}ч'.format(self.product_name, self.kit_work_ours)
-
-    class Meta:
-        verbose_name_plural = 'Услуги (набор работ)'
-
-
-KitService._meta.get_field('in_price').help_text = 'Поле заполнится автоматически'
-KitService._meta.get_field('out_price').help_text = 'Поле заполнится автоматически'
 
 
