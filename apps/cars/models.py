@@ -35,6 +35,7 @@ class Car(models.Model):
                                verbose_name='Владелец',
                                help_text='выберете владельца авто',
                                related_name='car_client',
+                               blank=True,
                                )
 
     brand_model = models.ForeignKey(BrandModel,

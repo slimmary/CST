@@ -38,12 +38,6 @@ class WorkSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class WorkBriefSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Work
-        fields = ('service_name', 'work_our')
-
-
 class KitServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = KitService

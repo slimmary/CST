@@ -1,7 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 from datetime import date
-from apps.workorders.models import Work_order
 
 
 class Products(models.Model):
@@ -15,7 +14,8 @@ class Products(models.Model):
                                            )
     extra_charge = models.PositiveIntegerField(default=25,
                                                verbose_name='Наценка %',
-                                               help_text='Введите сколько % необходимо добавить к себестоимости продукта',
+                                               help_text='Введите сколько % необходимо добавить к себестоимости '
+                                                         'продукта',
                                                )
     out_price = models.PositiveIntegerField(default=0,
                                             verbose_name='Стоимость грн.',
@@ -25,13 +25,6 @@ class Products(models.Model):
                                        help_text='для добавления на склад поставьте галочку',
                                        default=False
                                        )
-    work_order = models.ForeignKey(Work_order,
-                                   on_delete=models.CASCADE,
-                                   null=True,
-                                   verbose_name='ЗН',
-                                   help_text='выберите ЗН',
-                                   blank=True
-                                   )
 
     def save(self, *args, **kwargs):
         self.out_price = self.in_price + (self.in_price/100 *self.extra_charge)
@@ -53,13 +46,7 @@ class Service(models.Model):
                                    verbose_name='н.часы (AV)',
                                    help_text='Введите количество н.часов (AV, 1 = 5мин)',
                                    )
-    work_order = models.ForeignKey(Work_order,
-                                   on_delete=models.CASCADE,
-                                   null=True,
-                                   verbose_name='ЗН',
-                                   help_text='выберите ЗН',
-                                   blank=True
-                                   )
+
     class Meta:
         abstract = True
 
@@ -176,6 +163,6 @@ class Oil(Products):
         return '{} объём масла {} '.format(self.product_name, self.stock_l)
 
     class Meta:
-        verbose_name_plural = 'Масло'
+        verbose_name_plural = 'Масла'
 
 

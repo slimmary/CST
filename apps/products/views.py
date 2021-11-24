@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.pagination import LimitOffsetPagination
 from .models import Part, Oil, OilContainer, Work, KitService
 from .serializers import PartSerializer, PartBriefSerializer, OilSerializer, OilBriefSerializer,\
-    OilContainerSerializer, WorkSerializer, WorkBriefSerializer, KitServiceSerializer, KitServiceBriefSerializer
+    OilContainerSerializer, WorkSerializer, KitServiceSerializer, KitServiceBriefSerializer
 
 
 class PartList(generics.ListCreateAPIView):
@@ -40,7 +40,7 @@ class OilContainerList(generics.ListCreateAPIView):
 
 class WorkList(generics.ListCreateAPIView):
     queryset = Work.objects.all()
-    serializer_class = WorkBriefSerializer
+    serializer_class = WorkSerializer
     pagination_class = LimitOffsetPagination
 
 
