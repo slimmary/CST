@@ -1,4 +1,6 @@
 Django==2.2.24
 django-jet==1.0.8
 djangorestframework==3.11.2
-psycopg2-binary==2.8.4
+psycopg2==2.8.6
+phonenumbers==8.12.40
+django-phonenumber-field==6.0.0

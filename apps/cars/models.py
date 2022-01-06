@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from apps.users.models import ClientProfile
 import datetime
 
 
@@ -29,7 +29,7 @@ class BrandModel(models.Model):
 
 
 class Car(models.Model):
-    client = models.ForeignKey(User,
+    client = models.ForeignKey(ClientProfile,
                                null=True,
                                on_delete=models.CASCADE,
                                verbose_name='Владелец',

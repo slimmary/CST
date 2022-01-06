@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from .permissions import IsOwnerOrAdmin, ReadOnlyMethod
 from rest_framework import generics
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -7,13 +9,24 @@ from .serializers import WorkOrderSerializer, WorkOrderBriefSerializer, WorOrder
 
 
 class WorkOrderList(generics.ListCreateAPIView):
-    queryset = WorkOrder.objects.all()
     serializer_class = WorkOrderBriefSerializer
     pagination_class = LimitOffsetPagination
+    permission_classes = [ReadOnlyMethod, IsAuthenticated, IsOwnerOrAdmin]
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return WorkOrder.objects.all()
+        if self.request.user.profile:
+            return WorkOrder.objects.filter(car__client=self.request.user.profile)
 
 
 class WorkOrderDetail(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = WorkOrderSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return WorkOrderSerializer
+        return WorkOrderBriefSerializer
 
     def get_object(self):
         return get_object_or_404(WorkOrder, pk=self.kwargs.get('work_order_id'))
@@ -27,6 +40,7 @@ class WorOrderItemList(generics.ListCreateAPIView):
 
 class WorOrderItemDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = WorOrderItemSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
 
     def get_object(self):
         return get_object_or_404(WorOrderItem, pk=self.kwargs.get('work_order_item_id'))

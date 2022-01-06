@@ -11,7 +11,7 @@ class WorkOrderSerializer(serializers.ModelSerializer):
 class WorkOrderBriefSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkOrder
-        fields = ('open_date', 'car', 'status', 'av_price', 'total_price', 'close_date',)
+        fields = ('open_date', 'car', 'status', 'total_price', 'close_date',)
 
 
 class WorOrderItemSerializer(serializers.ModelSerializer):

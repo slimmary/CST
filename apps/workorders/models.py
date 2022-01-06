@@ -86,7 +86,7 @@ class WorOrderItem(models.Model):
                              on_delete=models.CASCADE,
                              verbose_name='ЗЧ',
                              related_name='work_order_item_part',
-                             help_text='Выберите ЗЧ использованную по ЗН',
+                             help_text='Выберите ЗЧ, использованную по ЗН',
                              blank=True
                              )
     oil = models.ForeignKey(Oil,
