@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import WorkOrder, WorOrderItem
+from .models import WorkOrder, WorkOrderItem
 
 
 class WorkOrderSerializer(serializers.ModelSerializer):
@@ -14,7 +14,7 @@ class WorkOrderBriefSerializer(serializers.ModelSerializer):
         fields = ('open_date', 'car', 'status', 'total_price', 'close_date',)
 
 
-class WorOrderItemSerializer(serializers.ModelSerializer):
+class WorkOrderItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WorOrderItem
+        model = WorkOrderItem
         fields = '__all__'

@@ -74,7 +74,7 @@ class WorkOrder(models.Model):
         verbose_name_plural = 'Заказ-Наряды'
 
 
-class WorOrderItem(models.Model):
+class WorkOrderItem(models.Model):
     work_order = models.ForeignKey(WorkOrder,
                                    on_delete=models.CASCADE,
                                    verbose_name='ЗН',

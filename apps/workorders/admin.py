@@ -1,18 +1,18 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import WorkOrder, WorOrderItem
+from .models import WorkOrder, WorkOrderItem
 
 
-class WorOrderItemInline(admin.StackedInline):
+class WorkOrderItemInline(admin.StackedInline):
     list_per_page = 20
-    model = WorOrderItem
+    model = WorkOrderItem
     fields = ('part', 'oil', 'service', 'kit_service')
 
 
 class WorkOrderAdmin(admin.ModelAdmin):
     list_per_page = 20
-    inlines = [WorOrderItemInline,]
+    inlines = [WorkOrderItemInline,]
     list_display = ('open_date',
                     'close_date',
                     'status',
@@ -44,7 +44,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
     get_car_link.short_description = 'Автомобиль'
 
 
-class WorOrderItemAdmin(admin.ModelAdmin):
+class WorkOrderItemAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_display = ('work_order_link',
                     'part',
@@ -72,4 +72,4 @@ class WorOrderItemAdmin(admin.ModelAdmin):
 
 
 admin.site.register(WorkOrder, WorkOrderAdmin)
-admin.site.register(WorOrderItem, WorOrderItemAdmin)
+admin.site.register(WorkOrderItem, WorkOrderItemAdmin)
