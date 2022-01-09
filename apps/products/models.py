@@ -27,7 +27,7 @@ class Products(models.Model):
                                        )
 
     def save(self, *args, **kwargs):
-        self.out_price = self.in_price + (self.in_price/100 *self.extra_charge)
+        self.out_price = self.in_price + (self.in_price / 100 * self.extra_charge)
 
         super(Products, self).save(*args, **kwargs)
 
@@ -42,10 +42,10 @@ class Service(models.Model):
                                     help_text='Введите названия работы',
                                     )
     work_our = models.PositiveIntegerField(
-                                   default=1,
-                                   verbose_name='н.часы (AV)',
-                                   help_text='Введите количество н.часов (AV, 1 = 5мин)',
-                                   )
+        default=1,
+        verbose_name='н.часы (AV)',
+        help_text='Введите количество н.часов (AV, 1 = 5мин)',
+    )
 
     class Meta:
         abstract = True
@@ -61,7 +61,6 @@ class Work(Service):
 
 
 class KitService(Service):
-
     services = models.ManyToManyField(Work,
                                       related_name='kit_service',
                                       verbose_name='набор работ',
@@ -152,17 +151,29 @@ class Oil(Products):
                                   validators=[MinValueValidator(0.00)]
                                   )
 
-    container = models.OneToOneField(OilContainer,
-                                     on_delete=models.CASCADE,
-                                     related_name='oil',
-                                     verbose_name='Тара',
-                                     help_text='Выберите тару, в которой поступило масло'
-                                     )
+    container = models.ForeignKey(OilContainer,
+                                  on_delete=models.CASCADE,
+                                  related_name='oil',
+                                  verbose_name='Тара',
+                                  help_text='Выберите тару, в которой поступило масло'
+                                  )
+    # to do: auto-add default stock_l=container
+    # @property
+    # def default_stock(self):
+    #     if self.container == self.container.ContainerL.two:
+    #         self.stock_l = 2
+    #     elif self.container == self.container.ContainerL.five:
+    #         self.stock_l = 5
+    #     elif self.container == self.container.ContainerL.ten:
+    #         self.stock_l = 10
+    #     elif self.container == self.container.ContainerL.twenty:
+    #         self.stock_l = 20
+    #     else:
+    #         self.stock_l = 2
+    #     return self.stock_l
 
     def __str__(self):
         return '{} объём масла {} '.format(self.product_name, self.stock_l)
 
     class Meta:
         verbose_name_plural = 'Масла'
-
-

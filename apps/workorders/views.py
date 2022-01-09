@@ -17,9 +17,7 @@ class WorkOrderList(generics.ListCreateAPIView):
         if self.request.user.is_staff:
             return WorkOrder.objects.all()
         else:
-            if self.request.user.profile:
-                return WorkOrder.objects.filter(car__client=self.request.user.profile)
-            return 'No permission'
+            return WorkOrder.objects.filter(car__client__user=self.request.user)
 
 
 class WorkOrderDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -31,7 +29,10 @@ class WorkOrderDetail(generics.RetrieveUpdateDestroyAPIView):
         return WorkOrderBriefSerializer
 
     def get_object(self):
-        return get_object_or_404(WorkOrder, pk=self.kwargs.get('work_order_id'), car__client=self.request.user.profile)
+        if self.request.user.is_staff:
+            return get_object_or_404(WorkOrder, pk=self.kwargs.get('work_order_id'))
+        else:
+            return get_object_or_404(WorkOrder, pk=self.kwargs.get('work_order_id'), car__client__user=self.request.user)
 
 
 class WorkOrderItemList(generics.ListCreateAPIView):
@@ -43,9 +44,7 @@ class WorkOrderItemList(generics.ListCreateAPIView):
         if self.request.user.is_staff:
             return WorkOrderItem.objects.all()
         else:
-            if self.request.user.profile:
-                return WorkOrderItem.objects.filter(work_order__car__client=self.request.user.profile)
-            return 'No permission'
+            return WorkOrderItem.objects.filter(work_order__car__client__user=self.request.user)
 
 
 class WorkOrderItemDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -53,4 +52,8 @@ class WorkOrderItemDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated & (IsAdminUser | ReadOnlyMethod)]
 
     def get_object(self):
-        return get_object_or_404(WorkOrderItem, pk=self.kwargs.get('work_order_item_id'), work_order__car__client=self.request.user.profile)
+        if self.request.user.is_staff:
+            return get_object_or_404(WorkOrderItem, pk=self.kwargs.get('work_order_item_id'))
+        else:
+            return get_object_or_404(WorkOrderItem, pk=self.kwargs.get('work_order_item_id'),
+                                     work_order__car__client__user=self.request.user)

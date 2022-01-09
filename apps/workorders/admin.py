@@ -7,7 +7,7 @@ from .models import WorkOrder, WorkOrderItem
 class WorkOrderItemInline(admin.StackedInline):
     list_per_page = 20
     model = WorkOrderItem
-    fields = ('part', 'oil', 'service', 'kit_service')
+    fields = ('part', 'oil', 'service', 'kit_service', 'amount')
 
 
 class WorkOrderAdmin(admin.ModelAdmin):
@@ -22,6 +22,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
                     'av_price',
                     'total_in_price_parts',
                     'total_out_price_parts',
+                    'total_out_price_oil',
                     'total_price_services',
                     'comment'
                     )
@@ -50,7 +51,8 @@ class WorkOrderItemAdmin(admin.ModelAdmin):
                     'part',
                     'oil',
                     'service',
-                    'kit_service'
+                    'kit_service',
+                    'amount'
                     )
 
     search_fields = ['work_order__car__car_number',

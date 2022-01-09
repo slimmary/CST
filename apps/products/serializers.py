@@ -11,7 +11,7 @@ class PartSerializer(serializers.ModelSerializer):
 class PartBriefSerializer(serializers.ModelSerializer):
     class Meta:
         model = Part
-        fields = ('product_name', 'part_number_original', 'part_manufacturer', 'part_number_cross', 'is_available')
+        fields = ('product_name', 'part_number_original', 'part_manufacturer', 'part_number_cross', 'out_price')
 
 
 class OilSerializer(serializers.ModelSerializer):
@@ -23,7 +23,7 @@ class OilSerializer(serializers.ModelSerializer):
 class OilBriefSerializer(serializers.ModelSerializer):
     class Meta:
         model = Oil
-        fields = ('product_name', 'stock_l', 'is_available')
+        fields = ('product_name', 'out_price')
 
 
 class OilContainerSerializer(serializers.ModelSerializer):
